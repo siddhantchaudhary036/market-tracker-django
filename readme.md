@@ -1,0 +1,2 @@
+# market-tracker-django
+track live institutional trades and news. THIS IS FOR EDUCATIONAL PURPOSES ONLY PLEASE DONT USE THIS APPLICATION AS FINANCIAL ADVISE IN ANYWAY
