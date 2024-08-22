@@ -1,0 +1,60 @@
+<!-- templates/add_success.html -->
+{% extends 'main.html' %}
+
+{% block title %}Recent news{% endblock %}
+
+{% block content %}
+<h1>Recent news</h1>
+<p> <a href="{% url 'manage_watchlist' %}">Manage stocks news alerts</a> </p>
+<form method="get">
+    {{ filter_news_form.as_p }}
+    <button type="submit">Filter</button>
+    <a href="{% url 'live_news' %}">Reset</a>
+</form>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Report Time</th>
+            <th>Company Name</th>
+            <th>Subject</th>
+            <th>Analyse </th>
+            <th> News Sentiment </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for news in added_entries %}
+        <tr>
+
+            <td>{{ news.report_time }}</td>
+            <td>{{ news.company_name }}</td>
+            <td>{{ news.subject }}</td>
+            <td>{{ news.sentiment_label }} score:{{ news.sentiment_score|floatformat:4 }}</td>
+            <td><a href="{% url 'live_news_analyse' news.id %}">Analyse this News</a></td>
+            
+ 
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if added_entries.has_previous %}
+            <a href="?page=1">&laquo; | first |</a>
+            <a href="?page={{ added_entries.previous_page_number }}">previous | </a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ added_entries.number }} of {{ added_entries.paginator.num_pages }}.
+        </span>
+
+        {% if added_entries.has_next %}
+            <a href="?page={{ added_entries.next_page_number }}">| next</a>
+            <a href="?page={{ added_entries.paginator.num_pages }}">| last | &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}

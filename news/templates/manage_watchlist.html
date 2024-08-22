@@ -1,0 +1,33 @@
+{% extends 'main.html' %}
+
+{% block title %} Manage Watchlist {% endblock %}
+
+{% block content %}
+
+<h1>Manage your watchlist here</h1>
+<p> You will receive an email at {{ user_email }} whenever news is released for the stocks in your watchlist.</p>
+
+<form method="get" action="{% url 'manage_watchlist' %}">
+    {{ manage_watchlist_form.as_p }}
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<p> Stocks currently in your list </p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ticker</th>
+            <th>Company Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for val in current_watchlist %}
+        <tr>
+            <td>{{ val.ticker }}</td>
+            <td>{{ val.company_name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

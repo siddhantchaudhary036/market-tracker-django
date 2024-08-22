@@ -1,0 +1,115 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="news-container">
+    <h1>Stock News Details</h1>
+    <div class="news-summary">
+        <h3>{{ news.company_name }}</h3>
+        <div class="news-box">
+            <h4>Body</h4>
+            <p>{{ news.body }}</p>
+        </div>
+        <div class="news-box">
+            <h4>Links</h4>
+            <p><strong>PDF URL:</strong> <a href="{{ news.pdf_url }}" target="_blank">{{ news.pdf_url }}</a></p>
+            <p><strong>BSE Page URL:</strong> <a href="{{ news.bse_page_url }}" target="_blank">{{ news.bse_page_url }}</a></p>
+        </div>
+        <div class="news-box">
+            <h4>Information</h4>
+            <p><strong>Subject:</strong> {{ news.subject }}</p>
+            <p><strong>Report Time:</strong> {{ news.report_time }}</p>
+            <p><strong>Ticker:</strong> {{ news.ticker }}</p>
+        </div>
+    </div>
+    <div class="news-analysis">
+        <h2>Analysis</h2>
+        <div class="news-box"></div>
+        <div class="news-box">
+            <h4>Close Values</h4>
+            <p>**if the charts below appear empty it's likely because the news release was not within market hours. Thus we cannot track its effect on the stock price.**</p>
+            {% if close_values %}
+                <img src="data:image/png;base64,{{ close_line_chart }}" alt="Line Chart">
+            {% else %}
+                <p>No data available for the past 10 minutes.</p>
+            {% endif %}
+        </div>
+        <div class="news-box">
+            <h4>Volume Values</h4>
+            <p>**if the charts below appear empty it's likely because the news release was not within market hours. Thus we cannot track its effect on the stock price.**</p>
+            {% if volume_values %}
+                <img src="data:image/png;base64,{{ volume_line_chart }}" alt="Line Chart">
+            {% else %}
+                <p>No data available for the past 10 minutes.</p>
+            {% endif %}
+            <p id="ltp_value"> {{ ltp_value |floatformat:2}}</p>
+            <p>Price Upon News Release = {{ price_upon_news_release|floatformat:2 }}</p>
+            <p>
+                Price Change: 
+                <span id="price_change" ></span>
+            </p>
+        </div>
+    </div>
+</div>
+
+{{ room_name|json_script:"room-name" }}
+{{ price_upon_news_release|json_script:"price-upon-news-release" }}
+
+<script>
+    const priceUponNewsRelease = JSON.parse(document.getElementById('price-upon-news-release').textContent);
+
+    // Retrieve roomName from the template
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    
+    // Log the connection URL for debugging
+    console.log(`Connecting to ws://${window.location.host}/ws/news/${roomName}/`);
+    
+    // Create a new WebSocket connection
+    const newsSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/news/'
+        + roomName
+        + '/'
+    );
+    
+
+    newsSocket.onopen = function(e) {
+        console.log("Connection established");
+    };
+
+  
+    newsSocket.onmessage = function(e) {
+        console.log("Message received: ", e.data);
+        const data = JSON.parse(e.data);
+        if (data['ltp_value'] !== undefined) {
+            const ltpValue = parseFloat(data['ltp_value']);
+            document.getElementById('ltp_value').innerText = `LTP (this is a websocket and updates live every second): ${ltpValue}`;
+            const priceChange = ltpValue - priceUponNewsRelease;
+            const priceChangeElement = document.getElementById('price_change');
+            priceChangeElement.innerText = priceChange.toFixed(2);
+            if (priceChange > 0) {
+                priceChangeElement.style.color = 'green';
+                priceChangeElement.innerHTML = `↑ ${priceChange.toFixed(2)}`;
+            } else if (priceChange < 0) {
+                priceChangeElement.style.color = 'red';
+                priceChangeElement.innerHTML = `↓ ${priceChange.toFixed(2)}`;
+            } else {
+                priceChangeElement.style.color = 'gray';
+                priceChangeElement.innerHTML = `→ ${priceChange.toFixed(2)}`;
+            }
+        }
+    };
+
+    // Define the event handler for when the WebSocket connection is closed
+    newsSocket.onclose = function(e) {
+        console.log("Connection closed");
+    };
+
+    // Define the event handler for when an error occurs with the WebSocket
+    newsSocket.onerror = function(e) {
+        console.error("WebSocket error: ", e);
+    };
+
+</script>
+
+{% endblock %}

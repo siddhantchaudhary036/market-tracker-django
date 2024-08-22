@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+
+
+{% block title %}logout{% endblock %}
+
+{% block content %}
+<div class="card p-4 shadow-lg" style="width: 100%; max-width: 400px; margin: 50px auto;">
+    <h2 class = "card-title text-center mb-4 "> Logout </h2>
+    
+    <form method="POST">
+
+        {% csrf_token %}
+        <input type="text" name="username" class="form-control" placeholder="Enter Your Username" required>
+        <p><p/>
+        <input type="password" name="password" class="form-control" placeholder="Enter Your Password" required>
+        <p><p/>
+        <button type="submit" class="btn btn-primary" action = "{% url 'logout' %}"method = "POST">logout</button>
+
+    </form>
+</h2>
+</div>
+{% endblock %}

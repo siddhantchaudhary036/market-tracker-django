@@ -1,0 +1,27 @@
+<!-- templates/heatmap.html -->
+{% extends 'main.html' %}
+
+{% block title %}Heatmap by Company{% endblock %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Recent Trades Heatmap</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Recent Trades Heatmap</h1>
+    <form method="get">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{formf.as_p}}
+        {{sector_checkbox.as_p}}
+        {{ form_quantity_checkbox.as_p }}
+        <button type="submit">Filter</button>
+        <a href="{% url 'recent_trades_heatmap' %}">Reset</a>
+    </form>
+    <div>{{ heatmap_html|safe }}</div>
+</body>
+
+{% endblock %}

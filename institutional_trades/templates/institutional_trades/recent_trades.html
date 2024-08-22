@@ -1,0 +1,66 @@
+<!-- templates/add_success.html -->
+{% extends 'main.html' %}
+
+{% block title %}Recent Trades{% endblock %}
+
+{% block content %}
+<h1>Recent Trades</h1>
+
+<form method="get">
+    {{ sector_dropdown_form.as_p }}
+    {{form_date.as_p}}
+    <button type="submit">Filter</button>
+    <a href="{% url 'recent_trades' %}">Reset</a>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Deal Date</th>
+            <th>Security Code</th>
+            <th>Company</th>
+            <th>Client Name</th>
+            <th>Deal Type</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Sector</th>
+            <th>Industry</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for trade in added_entries %}
+        <tr>
+
+            <td>{{ trade.deal_date|date:"M. j, Y" }}</td>
+            <td>{{ trade.security_code }}</td>
+            <td>{{ trade.company }}</td>
+            <td>{{ trade.client_name }}</td>
+            <td>{{ trade.deal_type }}</td>
+            <td>{{ trade.quantity }}</td>
+            <td>{{ trade.price }}</td>
+            <td>{{trade.sector}}</td>
+            <td>{{trade.industry}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if added_entries.has_previous %}
+            <a href="?page=1">&laquo; | first |</a>
+            <a href="?page={{ added_entries.previous_page_number }}">previous | </a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ added_entries.number }} of {{ added_entries.paginator.num_pages }}.
+        </span>
+
+        {% if added_entries.has_next %}
+            <a href="?page={{ added_entries.next_page_number }}">| next</a>
+            <a href="?page={{ added_entries.paginator.num_pages }}">| last | &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}
